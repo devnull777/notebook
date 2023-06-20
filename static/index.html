@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<body>
+
+		<h1>Записная книжка</h1>
+
+		<h2>Добавить запись:</h2>
+		<form id="noteForm">
+			    <label for="title">Заголовок:</label><br>
+			        <input type="text" id="title" name="title"><br>
+				    <label for="desc">Описание:</label><br>
+				        <textarea id="desc" name="desc"></textarea><br>
+					    <input type="button" value="Submit" onclick="addNote()">
+		</form> 
+
+		<h2>Все записи:</h2>
+		<button type="button" onclick="loadNotes()">Обновить</button>
+
+		<ul id="notesList"></ul>
+
+		<script>
+			function loadNotes() {
+							  fetch('http://94.131.107.4:8080/notes')
+							    .then(response => response.json())
+							    .then(data => {
+											          let list = "";
+											          data.forEach(note => {
+																          list += "<li>Заголовок: " + note.title + ", Описание: " + note.description + "</li>";
+																        });
+											          document.getElementById('notesList').innerHTML = list;
+											        });
+						}
+
+			function addNote() {
+							  const title = document.getElementById('title').value;
+							  const desc = document.getElementById('desc').value;
+
+							  const note = {
+											      title: title,
+											      description: desc
+											    };
+
+							  fetch('http://94.131.107.4:8080/notes', {
+											      method: 'POST',
+											      headers: {
+															            'Content-Type': 'application/json',
+															          },
+											      body: JSON.stringify(note),
+											    })
+							  .then(response => response.json())
+							  .then(data => {
+											      // после добавления новой записи, обновляем список записей
+											      loadNotes();
+											    })
+							  .catch((error) => {
+											      console.error('Error:', error);
+											    });
+						}
+		</script>
+
+	</body>
+</html>
